@@ -12,7 +12,7 @@ jobs:
 
     env:
       VCPKG_COMMIT: '058088532e33f23ac1ad31e32ad0bb1ab8e32195'
-      VCPKG_TARGET_TRIPLET: 'x86-windows'
+      VCPKG_DEFAULT_TRIPLET: 'x86-windows'
       VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg/installed
 
     steps:
@@ -28,8 +28,40 @@ jobs:
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
-        runVcpkgInstall: true
+
+    - name: Setup short path
+      run: |
+        subst V: ${{ github.workspace }}
+
+    - name: Cache vcpkg
+      uses: actions/cache@v3
+      with:
+        path: |
+          ${{ github.workspace }}/vcpkg/installed
+          ${{ github.workspace }}/vcpkg/packages
+          ${{ github.workspace }}/vcpkg/downloads
+        key: vcpkg-${{ runner.os }}-${{ env.VCPKG_COMMIT }}-${{ hashFiles('vcpkg.json') }}
+
+    - name: vcpkg install
+      env:
+        VCPKG_ROOT: V:\vcpkg
+        VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+      run: |
+        mkdir %VCPKG_ROOT%
+        xcopy /E /I /H vcpkg\* %VCPKG_ROOT%\
+        cd %VCPKG_ROOT%
+        .\vcpkg install --triplet=%VCPKG_DEFAULT_TRIPLET%
 
     - name: Package the build
+    # -X: exclude extra file attributes
+    # -r: recursive
+    # -9: maximum compression level
       run: |
-        zip -X -r gtk3.24-x86-windows.zip x86-windows -x x86-windows\debug\*
+        zip -X -r -9 gtk3.24-${{ env.VCPKG_DEFAULT_TRIPLET }}.zip ${{ env.VCPKG_DEFAULT_TRIPLET }}
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: gtk3.24-windows
+        path: gtk3.24-${{ env.VCPKG_DEFAULT_TRIPLET }}.zip
+        if-no-files-found: error
