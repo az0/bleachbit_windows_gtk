@@ -6,6 +6,12 @@ on:
       - main
   pull_request:
 
+variables:
+ - name : vcpkg.commit
+   value: '058088532e33f23ac1ad31e32ad0bb1ab8e32195'
+ - name : vcpkg.target.triplet
+   value: 'x86-windows'
+
 jobs:
   build:
     runs-on: windows-latest
@@ -20,24 +26,12 @@ jobs:
         arch: x86
 
     - name: Install vcpkg dependencies
-      uses: lukka/run-vcpkg@v10
-      with:
-        vcpkgDirectory: D:\a\bleachbit_windows_gtk\bleachbit_windows_gtk/vcpkg
-        vcpkgGitURL: https://github.com/microsoft/vcpkg.git
-        vcpkgGitCommitId: '058088532e33f23ac1ad31e32ad0bb1ab8e32195'
-        runVcpkgInstall: true
-        vcpkgJsonGlob: '**/vcpkg.json'
-        vcpkgJsonIgnores: '**/vcpkg/**'
-        runVcpkgFormatString: >-
-          install
-          --recurse
-          --clean-after-build
-          --x-install-root
-          ${{ env.VCPKG_INSTALLED_DIR }}
-          --triplet
-          x86-windows
-        useShell: true
-
+      uses: lukka/run-vcpkg@v11
+      inputs:
+        vcpkgGitCommitId: $(vcpkg.commit)
+      env:
+        VCPKG_DEFAULT_TRIPLET: ${{ vars.vcpkg.target.triplet }}
+          
     - name: Package the build
       run: |
         zip -X -r gtk3.24-x86-windows.zip x86-windows -x x86-windows\debug\*
