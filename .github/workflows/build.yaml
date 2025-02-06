@@ -60,7 +60,7 @@ jobs:
         zip -X -r -9 gtk3.24-${{ env.VCPKG_DEFAULT_TRIPLET }}.zip ${{ env.VCPKG_DEFAULT_TRIPLET }}
 
     - name: Upload build artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: gtk3.24-windows
         path: gtk3.24-${{ env.VCPKG_DEFAULT_TRIPLET }}.zip
