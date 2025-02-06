@@ -1,9 +1,12 @@
+
 name: Build and Package
 
 on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
   pull_request:
 
 jobs:
@@ -29,6 +32,7 @@ jobs:
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
 
+    # Avoid error during "vcpkg install" because of long paths.
     - name: Setup short path
       run: |
         subst V: ${{ github.workspace }}
@@ -48,8 +52,6 @@ jobs:
         VCPKG_ROOT: V:\vcpkg
         VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
       run: |
-        mkdir %VCPKG_ROOT%
-        xcopy /E /I /H vcpkg\* %VCPKG_ROOT%\
         cd /d %VCPKG_ROOT%
         .\vcpkg install --triplet=${{ env.VCPKG_DEFAULT_TRIPLET }}
 
@@ -58,7 +60,7 @@ jobs:
     # -r: recursive
     # -9: maximum compression level
       run: |
-        zip -X -r -9 gtk3.24-${{ env.VCPKG_DEFAULT_TRIPLET }}.zip ${{ env.VCPKG_DEFAULT_TRIPLET }}
+        zip -X -r -9 gtk3.24-${{ env.VCPKG_DEFAULT_TRIPLET }}.zip ${{ env.VCPKG_DEFAULT_TRIPLET }} -x  ${{ env.VCPKG_DEFAULT_TRIPLET }}\debug\*
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
@@ -66,3 +68,11 @@ jobs:
         name: gtk3.24-windows
         path: gtk3.24-${{ env.VCPKG_DEFAULT_TRIPLET }}.zip
         if-no-files-found: error
+
+    # Create GitHub Release when a tag is pushed
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: gtk3.24-${{ env.VCPKG_DEFAULT_TRIPLET }}.zip
+        generate_release_notes: true
