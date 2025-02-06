@@ -30,7 +30,7 @@ jobs:
         zip -X -r gtk3.24-x86-windows.zip x86-windows -x x86-windows\debug\*
     
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: gtk3.24-x86-windows
         path: gtk3.24-x86-windows.zip
