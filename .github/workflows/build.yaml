@@ -6,15 +6,13 @@ on:
       - main
   pull_request:
 
-variables:
- - name : vcpkg.commit
-   value: '058088532e33f23ac1ad31e32ad0bb1ab8e32195'
- - name : vcpkg.target.triplet
-   value: 'x86-windows'
-
 jobs:
   build:
     runs-on: windows-latest
+
+    env:
+      VCPKG_COMMIT: '058088532e33f23ac1ad31e32ad0bb1ab8e32195'
+      VCPKG_TARGET_TRIPLET: 'x86-windows'
 
     steps:
     - name: Checkout code
@@ -27,17 +25,23 @@ jobs:
 
     - name: Install vcpkg dependencies
       uses: lukka/run-vcpkg@v11
-      inputs:
-        vcpkgGitCommitId: $(vcpkg.commit)
-      env:
-        VCPKG_DEFAULT_TRIPLET: ${{ vars.vcpkg.target.triplet }}
+      with:
+        vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
+        vcpkgGitURL: https://github.com/microsoft/vcpkg.git
+        runVcpkgInstall: true
+        vcpkgJsonGlob: '**/vcpkg.json'
+        vcpkgJsonIgnores: 
+          - '**/vcpkg/**'
+        runVcpkgFormatString: 
+          - 'install'
+          - '--recurse'
+          - '--clean-after-build'
+          - '--x-install-root'
+          - '$[env.VCPKG_INSTALLED_DIR]'
+          - '--triplet'
+          - ${{ env.VCPKG_TARGET_TRIPLET }}
+        useShell: true
           
     - name: Package the build
       run: |
         zip -X -r gtk3.24-x86-windows.zip x86-windows -x x86-windows\debug\*
-    
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: gtk3.24-x86-windows
-        path: gtk3.24-x86-windows.zip
