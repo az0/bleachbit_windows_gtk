@@ -23,7 +23,7 @@ jobs:
       uses: lukka/run-vcpkg@v10
       with:
         vcpkgGitURL: https://github.com/microsoft/vcpkg.git
-        vcpkgGitCommitId: 058088532e33f23ac1ad31e32ad0bb1ab8e32195
+        vcpkgGitCommitId: '058088532e33f23ac1ad31e32ad0bb1ab8e32195'
         runVcpkgInstall: true
         vcpkgJsonGlob: '**/vcpkg.json'
         vcpkgJsonIgnores: ['**/vcpkg/**']
