@@ -27,16 +27,15 @@ jobs:
         vcpkgGitCommitId: '058088532e33f23ac1ad31e32ad0bb1ab8e32195'
         runVcpkgInstall: true
         vcpkgJsonGlob: '**/vcpkg.json'
-        vcpkgJsonIgnores: 
-          - '**/vcpkg/**'
-        runVcpkgFormatString: 
-          - 'install'
-          - '--recurse'
-          - '--clean-after-build'
-          - '--x-install-root'
-          - '$[env.VCPKG_INSTALLED_DIR]'
-          - '--triplet'
-          - 'x86-windows'
+        vcpkgJsonIgnores: '**/vcpkg/**'
+        runVcpkgFormatString: >-
+          install
+          --recurse
+          --clean-after-build
+          --x-install-root
+          ${{ env.VCPKG_INSTALLED_DIR }}
+          --triplet
+          x86-windows
         useShell: true
 
     - name: Package the build
