@@ -30,9 +30,8 @@ jobs:
         vcpkgGitURL: https://github.com/microsoft/vcpkg.git
         runVcpkgInstall: true
         vcpkgJsonGlob: '**/vcpkg.json'
-        vcpkgJsonIgnores: 
-          - '**/vcpkg/**'
-        runVcpkgFormatString: 
+        vcpkgJsonIgnores: '**/vcpkg/**'
+        runVcpkgFormatString:
           - 'install'
           - '--recurse'
           - '--clean-after-build'
@@ -41,7 +40,7 @@ jobs:
           - '--triplet'
           - ${{ env.VCPKG_TARGET_TRIPLET }}
         useShell: true
-          
+
     - name: Package the build
       run: |
         zip -X -r gtk3.24-x86-windows.zip x86-windows -x x86-windows\debug\*
