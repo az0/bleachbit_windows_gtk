@@ -31,14 +31,7 @@ jobs:
         runVcpkgInstall: true
         vcpkgJsonGlob: '**/vcpkg.json'
         vcpkgJsonIgnores: '**/vcpkg/**'
-        runVcpkgFormatString:
-          - 'install'
-          - '--recurse'
-          - '--clean-after-build'
-          - '--x-install-root'
-          - '$[env.VCPKG_INSTALLED_DIR]'
-          - '--triplet'
-          - ${{ env.VCPKG_TARGET_TRIPLET }}
+        runVcpkgFormatString: 'install --recurse --clean-after-build --x-install-root $[env.VCPKG_INSTALLED_DIR] --triplet ${{ env.VCPKG_TARGET_TRIPLET }}'
         useShell: true
 
     - name: Package the build
