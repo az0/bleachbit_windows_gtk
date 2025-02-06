@@ -43,14 +43,15 @@ jobs:
         key: vcpkg-${{ runner.os }}-${{ env.VCPKG_COMMIT }}-${{ hashFiles('vcpkg.json') }}
 
     - name: vcpkg install
+      shell: cmd
       env:
         VCPKG_ROOT: V:\vcpkg
         VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
       run: |
         mkdir %VCPKG_ROOT%
         xcopy /E /I /H vcpkg\* %VCPKG_ROOT%\
-        cd %VCPKG_ROOT%
-        .\vcpkg install --triplet=%VCPKG_DEFAULT_TRIPLET%
+        cd /d %VCPKG_ROOT%
+        .\vcpkg install --triplet=${{ env.VCPKG_DEFAULT_TRIPLET }}
 
     - name: Package the build
     # -X: exclude extra file attributes
